@@ -1,0 +1,87 @@
+/* Assignment 11. Two routers five subnets. */
+/* By Thomas Polcic Jepsen, original version by Per Dahlstrøm  */
+version 12.1X47-D15.4;
+system {
+    host-name vSRX_2;
+    /* User: root Password: Rootpass */
+    root-authentication {
+        encrypted-password "$1$4TkbZDtp$6E8C6Bg7K6gnHR31XnJjl0";
+    }
+}
+interfaces {
+    ge-0/0/3 {
+        unit 0 {
+            family inet {
+                /* Lan3 */
+                address 192.168.12.1/24;
+            }
+        }
+    }
+    ge-0/0/4 {
+        unit 0 {
+            family inet {
+                /* Lan4 */
+                address 192.168.13.1/24;
+            }
+        }
+    }
+    ge-0/0/6 {
+        unit 0 {
+            family inet {
+                /* Lan5 */
+                address 10.10.10.2/30;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        /* Route to Lan1 */
+        route 192.168.10.0/24 next-hop 10.10.10.1;
+        /* Route to Lan2 */
+        route 192.168.11.0/24 next-hop 10.10.10.1;
+    }
+}
+security {
+    policies {
+        from-zone myTrust_2 to-zone myTrust_2 {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone myTrust_2 {
+            interfaces {
+                ge-0/0/3.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+                ge-0/0/4.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+                ge-0/0/6.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

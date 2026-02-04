@@ -1,2 +1,2 @@
 Hey nerds
-![alt text]([image-url](https://github.com/TjTheG/Netv-rkslinks/blob/Opgave-53/Opgave%2053%20netv%C3%A6rksdiagram.vsdx)](https://github.com/TjTheG/Netv-rkslinks/blob/Opgave-53/Netv%C3%A6rksdiagram%20opgave%2053))
+<img width="537" height="453" alt="Skærmbillede 2026-02-04 134944" src="https://github.com/user-attachments/assets/2ea6f23f-8b73-4d7a-ba70-60e4ad7758d4" />

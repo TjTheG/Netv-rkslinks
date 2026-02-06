@@ -1,0 +1,67 @@
+/* vSRX_2 Configuration - Simple routing, no security policies */
+version 12.1X47-D15.4;
+system {
+    host-name vSRX_2;
+    root-authentication {
+        encrypted-password "$1$4TkbZDtp$6E8C6Bg7K6gnHR31XnJjl0";  
+    }
+}
+interfaces {
+    ge-0/0/1 {
+        unit 0 {
+            family inet {
+                address 192.168.12.1/24;  /* PC3's network */
+            }
+        }
+    }
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 192.168.13.1/24;  /* PC4's network */
+            }
+        }
+    }
+    ge-0/0/3 {
+        unit 0 {
+            family inet {
+                address 10.10.10.2/30;  /* Connection to vSRX_1 */
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 0.0.0.0/0 next-hop 10.10.10.1;  /* Default route to vSRX_1 */
+    }
+}
+security {
+    policies {
+        from-zone myTrust_2 to-zone myTrust_2 {
+            policy allow-all {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone myTrust_2 {
+            interfaces {
+                ge-0/0/1.0;
+                ge-0/0/2.0;
+                ge-0/0/3.0;
+            }
+            host-inbound-traffic {
+                system-services {
+                    ping;
+                    traceroute;
+                }
+            }
+        }
+    }
+}

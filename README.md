@@ -1,2 +1,2 @@
-Hey nerds
-<img width="537" height="453" alt="Skærmbillede 2026-02-04 134944" src="https://github.com/user-attachments/assets/2ea6f23f-8b73-4d7a-ba70-60e4ad7758d4" />
+
+<img width="533" height="407" alt="Skærmbillede 2026-02-12 102643" src="https://github.com/user-attachments/assets/bdf71d43-aae1-4eac-9ad8-a3638142a8db" />

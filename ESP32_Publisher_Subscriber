@@ -1,0 +1,97 @@
+#include <WiFi.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <PubSubClient.h>
+
+#define WIFI_SSID "your_actual_wifi_name"
+#define WIFI_PASSWORD "your_actual_password"
+
+#define MQTT_HOST "192.168.8.62"
+#define MQTT_PORT 1883
+#define MQTT_PUB_TEMP "værelse/temperatursensor"
+#define MQTT_SUB_TOPIC "værelse/temperatursensor"  // subscriber til samme topic som den publisher på
+
+const int oneWireBus = 4;
+
+OneWire oneWire(oneWireBus);
+DallasTemperature sensors(&oneWire);
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+unsigned long previousMillis = 0;
+const long interval = 10000;
+float temp;
+
+void connectToWifi() {
+  Serial.println("Connecting to Wi-Fi...");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("WiFi connected");
+  Serial.println(WiFi.localIP());
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.println(topic);
+  Serial.print("Message: ");
+  
+  String message = "";
+  for (int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  Serial.println(message);
+  
+  // Do something with the message
+  if (message == "ON") {
+    Serial.println("Received ON command");
+  } else if (message == "OFF") {
+    Serial.println("Received OFF command");
+  }
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.println("Connecting to MQTT...");
+    if (client.connect("ESP32Client")) {
+      Serial.println("Connected to MQTT");
+      // Subscribe to topic after connecting
+      client.subscribe(MQTT_SUB_TOPIC);
+      Serial.print("Subscribed to: ");
+      Serial.println(MQTT_SUB_TOPIC);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(9600);
+  sensors.begin();
+  connectToWifi();
+  client.setServer(MQTT_HOST, MQTT_PORT);
+  client.setCallback(callback);  // Set the callback function
+}
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();  // This processes incoming messages
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    sensors.requestTemperatures();
+    temp = sensors.getTempCByIndex(0);
+    client.publish(MQTT_PUB_TEMP, String(temp).c_str());
+    Serial.printf("Published: %.2f\n", temp);
+  }
+}
+```
+

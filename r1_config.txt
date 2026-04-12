@@ -1,52 +1,44 @@
+## Router provides DHCP on ge-0/0/1 and ge-0/0/2  
+## Extended DHCP configuration  
+## By Per Dahlstroem
 version 12.1X47-D15.4;
-
 system {
-    host-name vSRX_1;
+    host-name R1;
     /* User: root Password: Rootpass */
     root-authentication {
-        encrypted-password "$1$4TkbZDtp$6E8C6Bg7K6gnHR31XnJjl0";
+        encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/"; ## Rootpass
+    }
+    services {
+        ssh;
+        dhcp-local-server {
+            group Net3 {
+                interface ge-0/0/1.0;
+            }
+            group Net4 {
+                interface ge-0/0/2.0;
+            }
+        }
     }
 }
-
 interfaces {
     ge-0/0/1 {
         unit 0 {
             family inet {
-                /* Lan1 - PC1 */
-                address 192.168.11.1/24;
+                address 192.168.10.1/24;
             }
         }
     }
     ge-0/0/2 {
         unit 0 {
             family inet {
-                /* Lan2 - PC2 */
-                address 192.168.12.1/24;
-            }
-        }
-    }
-    ge-0/0/3 {
-        unit 0 {
-            family inet {
-                /* Lan5 - Forbindelse til R2 */
-                address 10.10.10.1/30;
+                address 192.168.11.1/24;
             }
         }
     }
 }
-
-routing-options {
-    static {
-        /* Route til Lan3 via R2 */
-        route 192.168.13.0/24 next-hop 10.10.10.2;
-        /* Route til Lan4 via R2 */
-        route 192.168.14.0/24 next-hop 10.10.10.2;
-    }
-}
-
 security {
     policies {
-        from-zone myTrust_1 to-zone myTrust_1 {
+        from-zone trust to-zone trust {
             policy default-permit {
                 match {
                     source-address any;
@@ -60,12 +52,14 @@ security {
         }
     }
     zones {
-        security-zone myTrust_1 {
+        security-zone trust {
             interfaces {
                 ge-0/0/1.0 {
                     host-inbound-traffic {
                         system-services {
                             ping;
+                            ssh;
+                            dhcp;
                         }
                     }
                 }
@@ -73,14 +67,49 @@ security {
                     host-inbound-traffic {
                         system-services {
                             ping;
+                            ssh;
+                            dhcp;
                         }
                     }
                 }
-                ge-0/0/3.0 {
-                    host-inbound-traffic {
-                        system-services {
-                            ping;
-                        }
+            }
+        }
+    }
+}
+access {
+    address-assignment {
+        pool Net3 {
+            family inet {
+                network 192.168.10.0/24;
+                range USERS {
+                    low 192.168.10.15;
+                    high 192.168.10.20;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000; /* ca 5,5 time */
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.10.1;
+                    }
+                }
+            }
+        }
+        pool Net4 {
+            family inet {
+                network 192.168.11.0/24;
+                range USERS {
+                    low 192.168.11.15;
+                    high 192.168.11.20;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000; /* ca 5,5 time */
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.11.1;
                     }
                 }
             }

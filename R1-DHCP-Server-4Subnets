@@ -1,0 +1,177 @@
+version 12.1X47-D15.4;
+system {
+    host-name R1;
+    /* User: root Password: Rootpass */
+    root-authentication {
+        encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
+    }
+    services {
+        ssh;
+        dhcp-local-server {
+            group Net3 {
+                interface ge-0/0/1.0;
+            }
+            group Net4 {
+                interface ge-0/0/2.0;
+            }
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                address 10.10.10.11/24;
+            }
+        }
+    }
+    ge-0/0/1 {
+        unit 0 {
+            family inet {
+                address 192.168.10.1/24;
+            }
+        }
+    }
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 192.168.11.1/24;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 192.168.12.0/24 next-hop 10.10.10.12;
+        route 192.168.13.0/24 next-hop 10.10.10.12;
+    }
+}
+security {
+    policies {
+        from-zone trust to-zone trust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone trust {
+            interfaces {
+                ge-0/0/0.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                            ssh;
+                            dhcp;
+                        }
+                    }
+                }
+                ge-0/0/1.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                            ssh;
+                            dhcp;
+                        }
+                    }
+                }
+                ge-0/0/2.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                            ssh;
+                            dhcp;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+access {
+    address-assignment {
+        pool Net3 {
+            family inet {
+                network 192.168.10.0/24;
+                range USERS {
+                    low 192.168.10.15;
+                    high 192.168.10.20;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000;
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.10.1;
+                    }
+                }
+                host WEBSERVER {
+                    hardware-address 00:0c:29:33:07:dc;
+                    ip-address 192.168.10.10;
+                }
+            }
+        }
+        pool Net4 {
+            family inet {
+                network 192.168.11.0/24;
+                range USERS {
+                    low 192.168.11.15;
+                    high 192.168.11.20;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000;
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.11.1;
+                    }
+                }
+            }
+        }
+        pool Net1 {
+            family inet {
+                network 192.168.12.0/24;
+                range USERS {
+                    low 192.168.12.50;
+                    high 192.168.12.60;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000;
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.12.1;
+                    }
+                }
+            }
+        }
+        pool Net2 {
+            family inet {
+                network 192.168.13.0/24;
+                range USERS {
+                    low 192.168.13.70;
+                    high 192.168.13.80;
+                }
+                dhcp-attributes {
+                    maximum-lease-time 20000;
+                    name-server {
+                        8.8.8.8;
+                    }
+                    router {
+                        192.168.13.1;
+                    }
+                }
+            }
+        }
+    }
+}

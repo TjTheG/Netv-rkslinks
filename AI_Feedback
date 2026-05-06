@@ -1,0 +1,89 @@
+Assignment 18 DHCP service on virtual router
+
+Part 1: Configure DHCP service.
+Please build the following network or something similar. Router R1 is with DHCP service for Net3 and Net4 and router R2 with DHCP service for Net1 and Net2. The routers are Juniper vSRXs.
+
+Make sure to:
+
+    have Wireshark installed on the PC´s.
+
+    initially set static IP´s on the PC´s and check that all PC´s can ping each other.
+    Tasks
+    Draw a topology diagram that shows where DHCP is applied and a brief explanation of where DHCP is applied in the topology.
+    Create screenshot and list configuration commands and description on how to configure: a. router R1 with Extended DHCP service for Net3 and Net4. b. router R2 with Legacy DHCP service for Net1 and Net2. Put the configurations on GitLab and a working link to it in the hand in.
+    Create one screenshot and a description of a. how to configure the PCs for DHCP b. one of the PCs IPV4 settings received form the router DHCP service.
+    Explain briefly in 3 - 6 lines in your own words what DORA is in the DHCP context.
+    Run Wireshark and show the DORA process. Comment on IP addresses, i.e. layer 3 addresses seen in Wireshark.
+    Explain briefly 3 lines maximum, what Transport layer 4 ports and protocol the DHCP client and server are using.
+    Show how ping and traceroute and Wireshark were used for possible troubleshooting.
+    Challenge: Reserve an IP address for a specific device by its MAC address. This is uesful for e.g. a WebServer or file server or printer that should always have the same IP address.
+    Explain terse in max 5 lines what APIPA is and show the APIPA route in the routing table on one of the PC´s.
+    Challenge: Make two devices on a network take APIPA adresses and show that they can intercommunicate. Wireshark the APIPA process. E.g. how do devices not assume the same APIPA IP address? Configuration(s) Please find the base configuration(s) for this assignment here:
+
+Part 2: Configure DHCP relay.
+Reconfigure R1 and R2 so that R1 is providing DHCP service for all four subnets Net1, Net2, Net3 and Net4 and R2 is acting as a DHCP relay for R1:
+Hint: See the configuration for assignment 9 for DHCP relay.
+Tasks
+
+    A topology diagram that shows where DHCP is applied and a brief explanation of where and how DHCP is applied in the topology.
+
+    Create one screenshot and configuration commands and description on how to configure:
+    a. router R1 with DHCP service for Net1, Net2, Net3 and Net4. b. router R2 with DHCP relay service.
+    Put the configurations on GitLab and a working link to it in the documentation.
+    Create one screenshot and description of a. PC4s IPV4 settings received form the router DHCP service.
+    Do a Wireshark that shows the DHCP request relay forwarding from router R2 to router R1.
+
+    Show how ping and traceroute and Wireshark were used for possible troubleshooting.
+    Documentation to hand in and Feedback.
+    Document the tasks.
+    It is obligatory to have a section at the end of the documentation with feedback. Please see the menu item "Feedback", on how to go about this.
+
+Jeg har arbejdet på denne opgave i netværk på UCL Odense.
+Her er min fil.
+
+Vil du give følgende feedback på min dokumentation. 
+
+    Tekniske løsninger: For hver eneste task med nummer, kommenter først på en ting der er gjort godt og derefter på en ting der kan forbedres. Kom gerne med et forslag til en teknisk løsning der hvor en task ikke succesfuldt er løst eller mangler. Gør klart opmærksom på hvis en task mangler besvarelse.
+
+18:20
+Claude responded: Her er feedback på din dokumentation, task for task:
+Analyserede opgaveopfyldelse og identificerede manglende dokumentation samt tekniske uoverensstemmelser
+
+Her er feedback på din dokumentation, task for task:
+Del 1
+
+Task 1 — Topologidiagram ✅ Godt: Diagrammet er til stede og viser netværkstopologien med routere og PC'er. ⚠️ Forbedring: Det fremgår ikke tydeligt af teksten ved diagrammet hvor DHCP er anvendt — altså at R1 server Net3/Net4 og R2 server Net1/Net2. Tilføj en kort forklarende tekst direkte under diagrammet.
+
+Task 2 — Konfigurationskommandoer R1 og R2 ✅ Godt: GitHub-link er inkluderet og metoden (load factory-default + load override terminal) er beskrevet. ⚠️ Forbedring: Selve konfigurationskommandoerne er ikke vist inline i dokumentet — man skal klikke sig ud på GitHub for at se dem. Opgaven beder om at kommandoerne er dokumenteret. Indsæt de vigtigste kommandoer direkte i dokumentet.
+
+Task 3 — PC DHCP-konfiguration og IPv4-indstillinger ✅ Godt: PC1's konfiguration er nævnt og der refereres til et screenshot. ⚠️ Forbedring: Det er uklart om screenshottet faktisk viser PC1's modtagne IPv4-indstillinger (IP, gateway, DNS, leasetid). Det bør fremgå eksplicit hvad IP-adressen, gateway og DNS-serveren er på screenshottet.
+
+Task 4 — Forklar DORA ✅ Godt: DORA er forklaret korrekt og forståeligt med alle fire trin. ⚠️ Forbedring: Det mangler at nævne at Discover og Request sendes som broadcasts (0.0.0.0 → 255.255.255.255), og at Acknowledge indeholder leasetiden. Det ville styrke forklaringen.
+
+Task 5 — Wireshark DORA + layer 3-kommentar ✅ Godt: DORA-processen er beskrevet ud fra Wireshark-optagelsen. ⚠️ Forbedring: Layer 3-kommentaren er for overfladisk. Opgaven beder specifikt om kommentar på IP-adresserne set i Wireshark — fx at source er 0.0.0.0 fordi klienten endnu ikke har en IP, og destination er 255.255.255.255 fordi det er en broadcast. Det bør stå eksplicit.
+
+Task 6 — Transport layer, porte og protokol ✅ Godt: UDP er korrekt identificeret med en god forklaring på hvorfor ikke TCP, og port 67/68 er nævnt. ⚠️ Forbedring: Du kan præcisere at port 68 er klientporten (bootpc) og port 67 er serverporten (bootps) — det ville gøre det endnu mere præcist.
+
+Task 7 — Ping, traceroute og Wireshark til troubleshooting ⚠️ Mangler besvarelse. Sektionen har en overskrift men ingen dokumentation af hvad der faktisk blev gjort. Tilføj konkrete screenshots og beskriv hvad du pingede, hvad traceroute viste, og hvad Wireshark afslørede under troubleshooting.
+
+Task 8 (Challenge) — IP-reservation med MAC-adresse ✅ Godt: Kommandoerne er vist tydeligt og processen er godt forklaret. ⚠️ Forbedring: Det ville styrke dokumentationen med et screenshot af show dhcp server binding der viser at den reserverede adresse er BOUND til MAC-adressen.
+
+Task 9 — APIPA-forklaring + routing table ✅ Godt: Grundidéen bag APIPA er korrekt forklaret. ⚠️ Forbedring: Forklaringen er ufuldstændig — den slutter med et punktum midt i. APIPA-adressen (169.254.x.x / 16) er ikke nævnt, og routing table-screenshottet mangler. Tilføj ip route show eller route -n output fra en PC med en APIPA-adresse.
+
+Task 10 (Challenge) — To enheder med APIPA + Wireshark ✅ Godt: Det er dokumenteret at begge enheder fik APIPA-adresser og at de kan pinge hinanden. ⚠️ Forbedring: Wireshark-optagelsen af selve APIPA-processen mangler, og spørgsmålet "hvordan undgår enheder at få samme APIPA-adresse?" er ikke besvaret. Svaret er ARP Probe — enheden sender en ARP-forespørgsel på den valgte adresse før den tager den i brug.
+Del 2
+
+Task 1 — Topologidiagram med DHCP relay ✅ Godt: Diagrammet er til stede. ⚠️ Forbedring: Samme problem som Del 1 Task 1 — den korte forklaring af hvor og hvordan DHCP er anvendt bør stå direkte under diagrammet, ikke bare implicit i diagrammet selv.
+
+Task 2 — Konfiguration R1 (alle 4 subnets) og R2 (relay) ✅ Godt: GitHub-link er inkluderet og metoden er beskrevet. ⚠️ Forbedring: Bemærk at dokumentet skriver "DHCP delay" i stedet for "DHCP relay" — ret dette. Derudover mangler konfigurationskommandoerne igen inline i dokumentet.
+
+Task 3 — PC4's IPv4-indstillinger ✅ Godt: Screenshottet er refereret og beskrevet. ⚠️ Forbedring: Beskriv eksplicit hvilken IP, gateway og DNS PC4 modtog, så det er tydeligt at det er fra den korrekte pulje (192.168.13.x).
+
+Task 4 — Wireshark relay forwarding ✅ Godt: Dette er den bedst dokumenterede task i Del 2. Wireshark-optagelsen er forklaret med giaddr, hops og source/destination. ⚠️ Forbedring: Indsæt selve Wireshark-screenshottet direkte i dokumentet frem for kun tekstbeskrivelsen.
+
+Task 5 — Ping, traceroute og Wireshark troubleshooting ⚠️ Mangler besvarelse. Ligesom Del 1 Task 7 er denne sektion ikke dokumenteret. Tilføj konkrete eksempler på hvad du brugte ping/traceroute/Wireshark til under fejlfindingen.
+Generelle bemærkninger
+
+    Xubuntu-versionen mangler i udstyrslisten.
+    Introen beskriver kun Del 2-opsætningen — den bør dække begge dele.
+    Feedbacksektionen er markeret som "AI Feedback" i udstyrslisten, hvilket ser ud som en placeholder — afklar om det er intentionelt.

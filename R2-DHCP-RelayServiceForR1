@@ -13,7 +13,7 @@ interfaces {
     ge-0/0/2 {
         unit 0 {
             family inet {
-                address 10.10.10.12/24;
+                address 10.10.10.2/30;
             }
         }
     }
@@ -35,16 +35,18 @@ interfaces {
 forwarding-options {
     helpers {
         bootp {
-            server 10.10.10.11;
-            interface ge-0/0/3.0;
-            interface ge-0/0/4.0;
+            server 10.10.10.1;
+            interface {
+                ge-0/0/3;
+                ge-0/0/4;
+            }
         }
     }
 }
 routing-options {
     static {
-        route 192.168.10.0/24 next-hop 10.10.10.11;
-        route 192.168.11.0/24 next-hop 10.10.10.11;
+        route 192.168.10.0/24 next-hop 10.10.10.1;
+        route 192.168.11.0/24 next-hop 10.10.10.1;
     }
 }
 security {

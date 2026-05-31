@@ -1,6 +1,6 @@
 version 12.1X47-D15.4;
-/* Konfiguration "lånt" fra https://drive.google.com/viewerng/viewer?url=https://gitlab.com/PerPer/networkingpages/-/raw/main/docs/documentation_examples/Ass47_NTP_Gruppe4.pdf
-/* Konfigurationen er rettet lidt til, og der er tilføjet security-zone untrust i bunden af konfigurationen.
+/* Konfiguration "lånt" fra https://drive.google.com/viewerng/viewer?url=https://gitlab.com/PerPer/networkingpages/-/raw/main/docs/documentation_examples/Ass47_NTP_Gruppe4.pdf */
+/* Konfigurationen er rettet lidt til, og der er tilføjet security-zone untrust i bunden af konfigurationen. */
 system {
     host-name R1;
     /* User: root Password: Rootpass */
@@ -8,7 +8,6 @@ system {
         encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
     }
 }
-
 interfaces {
     ge-0/0/0 {
         unit 0 {
@@ -37,16 +36,13 @@ interfaces {
         }
     }
 }
-
 routing-options {
     static {
         route 0.0.0.0/0 next-hop 10.56.16.1;
     }
 }
-
 security {
     nat {
-        /* NAT changes the source address of egress IP packets */
         source {
             rule-set trust-to-untrust {
                 from zone trust;
@@ -58,7 +54,6 @@ security {
                     }
                     then {
                         source-nat {
-                            /* Use egress interface source IP address */
                             interface;
                         }
                     }
@@ -79,6 +74,18 @@ security {
                 }
             }
         }
+        from-zone trust to-zone untrust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
         from-zone untrust to-zone trust {
             policy default-deny {
                 match {
@@ -87,7 +94,7 @@ security {
                     application any;
                 }
                 then {
-                    deny;              /* <-- var sat til permit — rettet til deny */
+                    deny;
                 }
             }
         }
@@ -109,21 +116,15 @@ security {
                         }
                     }
                 }
+            }
+        }
+        security-zone untrust {
+            interfaces {
                 ge-0/0/3.0 {
                     host-inbound-traffic {
                         system-services {
                             ping;
                         }
-                    }
-                }
-            }
-        }
-security-zone untrust {
-        interfaces {
-            ge-0/0/0.0 {
-                host-inbound-traffic {
-                    system-services {
-                        ping;
                     }
                 }
             }

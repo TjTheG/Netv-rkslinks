@@ -1,18 +1,23 @@
 version 12.1X47-D15.4;
-
+/* Konfiguration "lånt" fra https://drive.google.com/viewerng/viewer?url=https://gitlab.com/PerPer/networkingpages/-/raw/main/docs/documentation_examples/Ass47_NTP_Gruppe4.pdf
+/* Konfigurationen er rettet lidt til, og der er tilføjet security-zone untrust i bunden af konfigurationen.
 system {
-    host-name vSRX_1;
+    host-name R1;
     /* User: root Password: Rootpass */
     root-authentication {
-        encrypted-password "$1$4TkbZDtp$6E8C6Bg7K6gnHR31XnJjl0";
+        encrypted-password "$1$xH9xJoL6$MFOUYnZr4.Qj2NM24XInz/";
     }
 }
 
 interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet;
+        }
+    }
     ge-0/0/1 {
         unit 0 {
             family inet {
-                /* Lan1 - PC1 */
                 address 192.168.11.1/24;
             }
         }
@@ -20,7 +25,6 @@ interfaces {
     ge-0/0/2 {
         unit 0 {
             family inet {
-                /* Lan2 - PC2 */
                 address 192.168.12.1/24;
             }
         }
@@ -28,8 +32,7 @@ interfaces {
     ge-0/0/3 {
         unit 0 {
             family inet {
-                /* Lan5 - Forbindelse til R2 */
-                address 10.10.10.1/30;
+                address 10.56.16.80/22;
             }
         }
     }
@@ -37,16 +40,34 @@ interfaces {
 
 routing-options {
     static {
-        /* Route til Lan3 via R2 */
-        route 192.168.13.0/24 next-hop 10.10.10.2;
-        /* Route til Lan4 via R2 */
-        route 192.168.14.0/24 next-hop 10.10.10.2;
+        route 0.0.0.0/0 next-hop 10.56.16.1;
     }
 }
 
 security {
+    nat {
+        /* NAT changes the source address of egress IP packets */
+        source {
+            rule-set trust-to-untrust {
+                from zone trust;
+                to zone untrust;
+                rule rule-any-to-any {
+                    match {
+                        source-address 0.0.0.0/0;
+                        destination-address 0.0.0.0/0;
+                    }
+                    then {
+                        source-nat {
+                            /* Use egress interface source IP address */
+                            interface;
+                        }
+                    }
+                }
+            }
+        }
+    }
     policies {
-        from-zone myTrust_1 to-zone myTrust_1 {
+        from-zone trust to-zone trust {
             policy default-permit {
                 match {
                     source-address any;
@@ -58,9 +79,21 @@ security {
                 }
             }
         }
+        from-zone untrust to-zone trust {
+            policy default-deny {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    deny;              /* <-- var sat til permit — rettet til deny */
+                }
+            }
+        }
     }
     zones {
-        security-zone myTrust_1 {
+        security-zone trust {
             interfaces {
                 ge-0/0/1.0 {
                     host-inbound-traffic {
@@ -81,6 +114,16 @@ security {
                         system-services {
                             ping;
                         }
+                    }
+                }
+            }
+        }
+security-zone untrust {
+        interfaces {
+            ge-0/0/0.0 {
+                host-inbound-traffic {
+                    system-services {
+                        ping;
                     }
                 }
             }
